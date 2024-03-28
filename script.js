@@ -17,14 +17,14 @@ const account2 = {
 };
 
 const account3 = {
-  owner: 'John Doe',
+  owner: 'John Foe ',
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
 };
 
 const account4 = {
-  owner: 'Sarah Smith',
+  owner: 'Sarah Smith Sike',
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
@@ -74,3 +74,14 @@ const displayMovements = function (movements) {
   });
 };
 displayMovements(account1.movements);
+const createUsername = function (accounts) {
+  accounts.forEach(account => {
+    account.username = account.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name.at(0))
+      .join('');
+  });
+};
+createUsername(accounts);
+console.log(accounts);
