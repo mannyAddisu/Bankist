@@ -58,6 +58,17 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+const createUsername = function (accounts) {
+  accounts.forEach(account => {
+    account.username = account.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name.at(0))
+      .join('');
+  });
+};
+createUsername(accounts);
+
 const displayMovements = function (movements) {
   containerMovements.innerHTML = '';
   movements.forEach(function (mov, i) {
@@ -73,38 +84,50 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
+// displayMovements(account1.movements);
 const displayBalance = function (movements) {
   labelBalance.textContent = `${movements.reduce(
     (acc, val) => acc + val,
     0
   )} €`;
 };
-displayBalance(account1.movements);
-const createUsername = function (accounts) {
-  accounts.forEach(account => {
-    account.username = account.owner
-      .toLowerCase()
-      .split(' ')
-      .map(name => name.at(0))
-      .join('');
-  });
-};
-createUsername(accounts);
-const displaySummary = function (movements) {
-  const income = movements
+// displayBalance(account1.movements);
+const displaySummary = function (account) {
+  const income = account.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  const withdrawal = movements
+  const withdrawal = account.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + Math.abs(mov), 0);
-  const interest = movements
+  const interest = account.movements
     .filter(mov => mov > 0)
-    .map(deposit => deposit * (1.2 / 100))
+    .map(deposit => deposit * ((account.interestRate * 10) / 1000))
     .filter(interest => interest >= 1)
     .reduce((acc, mov) => acc + Math.abs(mov), 0);
   labelSumIn.textContent = `${income} €`;
   labelSumOut.textContent = `${withdrawal} €`;
   labelSumInterest.textContent = `${interest} €`;
 };
-displaySummary(account1.movements);
+// displaySummary(account1.account.movements);
+let currentAccount;
+//?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    //optional chaining coz if non matching username is entered it throws an error
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = '100';
+
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur(); //to make the cursor lose foucs after we log in
+
+    displayMovements(currentAccount.movements);
+    displayBalance(currentAccount.movements);
+    displaySummary(currentAccount);
+  } else alert('Wrong Credentials!');
+});
