@@ -67,13 +67,20 @@ const displayMovements = function (movements) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     }. ${type}</div>
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov} €</div>
     </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
 displayMovements(account1.movements);
+const displayBalance = function (movements) {
+  labelBalance.textContent = `${movements.reduce(
+    (acc, val) => acc + val,
+    0
+  )} €`;
+};
+displayBalance(account1.movements);
 const createUsername = function (accounts) {
   accounts.forEach(account => {
     account.username = account.owner
@@ -84,4 +91,20 @@ const createUsername = function (accounts) {
   });
 };
 createUsername(accounts);
-console.log(accounts);
+const displaySummary = function (movements) {
+  const income = movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  const withdrawal = movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + Math.abs(mov), 0);
+  const interest = movements
+    .filter(mov => mov > 0)
+    .map(deposit => deposit * (1.2 / 100))
+    .filter(interest => interest >= 1)
+    .reduce((acc, mov) => acc + Math.abs(mov), 0);
+  labelSumIn.textContent = `${income} €`;
+  labelSumOut.textContent = `${withdrawal} €`;
+  labelSumInterest.textContent = `${interest} €`;
+};
+displaySummary(account1.movements);
