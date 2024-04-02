@@ -107,6 +107,11 @@ const displaySummary = function (account) {
   labelSumOut.textContent = `${withdrawal} Br`;
   labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
 };
+const updateUI = function (account) {
+  displayMovements(account.movements);
+  displayBalance(account);
+  displaySummary(account);
+};
 // displaySummary(account1.account.movements);
 let currentAccount;
 //?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
@@ -124,10 +129,7 @@ btnLogin.addEventListener('click', function (e) {
 
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur(); //to make the cursor lose foucs after we log in
-
-    displayMovements(currentAccount.movements);
-    displayBalance(currentAccount);
-    displaySummary(currentAccount);
+    updateUI(currentAccount);
   } else alert('Wrong Credentials!');
 });
 
@@ -143,9 +145,7 @@ btnTransfer.addEventListener('click', function (e) {
   ) {
     reciever.movements.push(amount);
     currentAccount.movements.push(-amount);
-    displayBalance(currentAccount);
-    displayMovements(currentAccount.movements);
-    displaySummary(currentAccount);
+    updateUI(currentAccount);
   } else alert('Invalid transfer!');
   inputTransferTo.value = inputTransferAmount.value = '';
   inputTransferAmount.blur(); //to make the cursor lose foucs after we log in
