@@ -19,7 +19,7 @@ const account2 = {
 const account3 = {
   owner: 'John Foe ',
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
-  interestRate: 0.7,
+  interestRate: 1.2,
   pin: 3333,
 };
 
@@ -78,18 +78,16 @@ const displayMovements = function (movements) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     }. ${type}</div>
-      <div class="movements__value">${mov} €</div>
+      <div class="movements__value">${mov} Br</div>
     </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
 // displayMovements(account1.movements);
-const displayBalance = function (movements) {
-  labelBalance.textContent = `${movements.reduce(
-    (acc, val) => acc + val,
-    0
-  )} €`;
+const displayBalance = function (account) {
+  account.balance = account.movements.reduce((acc, val) => acc + val, 0);
+  labelBalance.textContent = `${account.balance} Br`;
 };
 // displayBalance(account1.movements);
 const displaySummary = function (account) {
@@ -104,9 +102,10 @@ const displaySummary = function (account) {
     .map(deposit => deposit * ((account.interestRate * 10) / 1000))
     .filter(interest => interest >= 1)
     .reduce((acc, mov) => acc + Math.abs(mov), 0);
-  labelSumIn.textContent = `${income} €`;
-  labelSumOut.textContent = `${withdrawal} €`;
-  labelSumInterest.textContent = `${interest} €`;
+  const [interestMain, [x, y, ...others]] = String(interest).split('.');
+  labelSumIn.textContent = `${income} Br`;
+  labelSumOut.textContent = `${withdrawal} Br`;
+  labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
 };
 // displaySummary(account1.account.movements);
 let currentAccount;
@@ -127,7 +126,27 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginPin.blur(); //to make the cursor lose foucs after we log in
 
     displayMovements(currentAccount.movements);
-    displayBalance(currentAccount.movements);
+    displayBalance(currentAccount);
     displaySummary(currentAccount);
   } else alert('Wrong Credentials!');
+});
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const reciever = accounts.find(acc => acc.username === inputTransferTo.value);
+  if (
+    reciever &&
+    amount > 0 &&
+    amount <= currentAccount.balance &&
+    inputTransferTo.value !== currentAccount.username
+  ) {
+    reciever.movements.push(amount);
+    currentAccount.movements.push(-amount);
+    displayBalance(currentAccount);
+    displayMovements(currentAccount.movements);
+    displaySummary(currentAccount);
+  } else alert('Invalid transfer!');
+  inputTransferTo.value = inputTransferAmount.value = '';
+  inputTransferAmount.blur(); //to make the cursor lose foucs after we log in
 });

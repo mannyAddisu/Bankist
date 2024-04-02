@@ -13,7 +13,7 @@ body {
   font-family: 'Poppins', sans-serif;
   color: #444;
   background-color: #f3f3f3;
-  height: 100vh;
+  height: 100%;
   padding: 2rem;
 }
 
@@ -122,8 +122,26 @@ nav {
   background-color: #fff;
   border-radius: 1rem;
   overflow: scroll;
+  /* -webkit-scrollbar: none; */
+}
+.movements::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 2px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #e5e4e4;
+  border-radius: 40px;
+}
+
+/* Handle on hover */
 .movements__row {
   padding: 2.25rem 4rem;
   display: flex;
@@ -166,7 +184,7 @@ nav {
   grid-row: 5 / 6;
   display: flex;
   align-items: baseline;
-  padding: 0 0.3rem;
+  padding: 0 1rem;
   margin-top: 1rem;
 }
 
