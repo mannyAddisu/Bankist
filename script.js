@@ -83,7 +83,7 @@ const displayMovements = function (movements, sort = false) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     }. ${type}</div>
-      <div class="movements__value">${mov} Br</div>
+      <div class="movements__value">${mov.toFixed(2)} Br</div>
     </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -92,7 +92,7 @@ const displayMovements = function (movements, sort = false) {
 // displayMovements(account1.movements);
 const displayBalance = function (account) {
   account.balance = account.movements.reduce((acc, val) => acc + val, 0);
-  labelBalance.textContent = `${account.balance} Br`;
+  labelBalance.textContent = `${account.balance.toFixed(2)} Br`;
 };
 // displayBalance(account1.movements);
 const displaySummary = function (account) {
@@ -107,10 +107,11 @@ const displaySummary = function (account) {
     .map(deposit => deposit * ((account.interestRate * 10) / 1000))
     .filter(interest => interest >= 1)
     .reduce((acc, mov) => acc + Math.abs(mov), 0);
-  const [interestMain, [x = 0, y = 0, ...others]] = String(interest).split('.');
-  labelSumIn.textContent = `${income} Br`;
-  labelSumOut.textContent = `${withdrawal} Br`;
-  labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
+  // const [interestMain, [x = 0, y = 0, ...others]] = String(interest).split('.');
+  labelSumIn.textContent = `${income.toFixed(2)} Br`;
+  labelSumOut.textContent = `${withdrawal.toFixed(2)} Br`;
+  // labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
+  labelSumInterest.textContent = `${interest.toFixed(2)} Br`;
 };
 const updateUI = function (account) {
   displayMovements(account.movements);
@@ -158,7 +159,7 @@ btnTransfer.addEventListener('click', function (e) {
 
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(Number(inputLoanAmount.value));
   if (currentAccount.loan.length === 0) {
     if (
       currentAccount.movements.some(mov => mov >= amount * 0.1) &&
