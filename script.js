@@ -115,7 +115,6 @@ const formattedDate = function (date) {
   const calcDaysPassed = (date1, date2) =>
     Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   const daysPassed = calcDaysPassed(now, date);
-  console.log(daysPassed);
 
   if (daysPassed === 0) return 'Today';
   if (daysPassed === 1) return 'Yesterday';
@@ -145,9 +144,7 @@ const displayMovements = function (account, sort = false) {
   mov.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(account.movementsDates[i]);
-
     const displayDate = formattedDate(date);
-
     const html = `
     <div class="movements__row">
       <div class="movements__type movements__type--${type}">${
@@ -190,9 +187,7 @@ const updateUI = function (account) {
   displaySummary(account);
 };
 // displaySummary(account1.account.movements);
-let currentAccount = account1;
-updateUI(account1);
-containerApp.style.opacity = 100;
+let currentAccount;
 //?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
