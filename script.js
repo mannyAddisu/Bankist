@@ -18,6 +18,8 @@ const account1 = {
     '2024-04-02T23:36:17.929Z',
     '2024-04-04T10:51:36.790Z',
   ],
+  locale: 'en-US',
+  currency: 'ETB',
 };
 
 const account2 = {
@@ -36,6 +38,8 @@ const account2 = {
     '2020-06-25T18:49:59.371Z',
     '2020-07-26T12:01:20.894Z',
   ],
+  locale: 'en-US',
+  currency: 'USD',
 };
 
 const account3 = {
@@ -54,6 +58,8 @@ const account3 = {
     '2020-06-25T18:49:59.371Z',
     '2020-07-26T12:01:20.894Z',
   ],
+  locale: 'de-DE',
+  currency: 'EUR',
 };
 
 const account4 = {
@@ -72,6 +78,8 @@ const account4 = {
     '2020-06-25T18:49:59.371Z',
     '2020-07-26T12:01:20.894Z',
   ],
+  locale: 'en-UK',
+  currency: 'GBP',
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -103,13 +111,22 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 const now = new Date();
-const day = `${now.getDate()}`.padStart(2, 0);
-const month = `${now.getMonth() + 1}`.padStart(2, 0);
-const year = `${now.getFullYear()}`;
-const hour = `${now.getHours()}`.padStart(2, 0);
-const min = `${now.getMinutes()}`.padStart(2, 0);
+// const day = `${now.getDate()}`.padStart(2, 0);
+// const month = `${now.getMonth() + 1}`.padStart(2, 0);
+// const year = `${now.getFullYear()}`;
+// const hour = `${now.getHours()}`.padStart(2, 0);
+// const min = `${now.getMinutes()}`.padStart(2, 0);
 
-labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+// labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+const locale = navigator.language;
+const options = {
+  hour: 'numeric',
+  minute: 'numeric',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+labelDate.textContent = new Intl.DateTimeFormat(locale, options).format(now);
 
 const formattedDate = function (date) {
   const calcDaysPassed = (date1, date2) =>
@@ -119,10 +136,13 @@ const formattedDate = function (date) {
   if (daysPassed === 0) return 'Today';
   if (daysPassed === 1) return 'Yesterday';
   if (daysPassed <= 7) return `${daysPassed}days ago`;
-  const day = `${date.getDate()}`.padStart(2, 0);
-  const month = `${date.getMonth() + 1}`.padStart(2, 0);
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  return new Intl.DateTimeFormat(locale, options).format(date);
+};
+const formatNum = function (acc, num) {
+  return new Intl.NumberFormat(acc.locale, {
+    style: 'currency',
+    currency: acc.currency,
+  }).format(num);
 };
 
 const createUsername = function (accounts) {
@@ -145,13 +165,14 @@ const displayMovements = function (account, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(account.movementsDates[i]);
     const displayDate = formattedDate(date);
+    const formattedNum = formatNum(account, mov);
     const html = `
     <div class="movements__row">
       <div class="movements__type movements__type--${type}">${
       i + 1
     }. ${type}</div>
     <div class="movements__date">${displayDate}</div>
-      <div class="movements__value">${mov.toFixed(2)} Br</div>
+      <div class="movements__value">${formattedNum}</div>
     </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -160,7 +181,7 @@ const displayMovements = function (account, sort = false) {
 // displayMovements(account1.movements);
 const displayBalance = function (account) {
   account.balance = account.movements.reduce((acc, val) => acc + val, 0);
-  labelBalance.textContent = `${account.balance.toFixed(2)} Br`;
+  labelBalance.textContent = formatNum(account, account.balance);
 };
 // displayBalance(account1.movements);
 const displaySummary = function (account) {
@@ -176,10 +197,10 @@ const displaySummary = function (account) {
     .filter(interest => interest >= 1)
     .reduce((acc, mov) => acc + Math.abs(mov), 0);
   // const [interestMain, [x = 0, y = 0, ...others]] = String(interest).split('.');
-  labelSumIn.textContent = `${income.toFixed(2)} Br`;
-  labelSumOut.textContent = `${withdrawal.toFixed(2)} Br`;
+  labelSumIn.textContent = `${formatNum(account, income)}`;
+  labelSumOut.textContent = `${formatNum(account, withdrawal)}`;
   // labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
-  labelSumInterest.textContent = `${interest.toFixed(2)} Br`;
+  labelSumInterest.textContent = `${formatNum(account, interest)}`;
 };
 const updateUI = function (account) {
   displayMovements(account);
@@ -187,7 +208,9 @@ const updateUI = function (account) {
   displaySummary(account);
 };
 // displaySummary(account1.account.movements);
-let currentAccount;
+let currentAccount = account1;
+updateUI(account1);
+containerApp.style.opacity = 100;
 //?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
