@@ -179,11 +179,13 @@ const displayMovements = function (account, sort = false) {
   });
 };
 // displayMovements(account1.movements);
+
 const displayBalance = function (account) {
   account.balance = account.movements.reduce((acc, val) => acc + val, 0);
   labelBalance.textContent = formatNum(account, account.balance);
 };
 // displayBalance(account1.movements);
+
 const displaySummary = function (account) {
   const income = account.movements
     .filter(mov => mov > 0)
@@ -202,14 +204,35 @@ const displaySummary = function (account) {
   // labelSumInterest.textContent = `${interestMain}.${x}${y} Br`; //to only display the first two digits after the decimal point
   labelSumInterest.textContent = `${formatNum(account, interest)}`;
 };
+
 const updateUI = function (account) {
   displayMovements(account);
   displayBalance(account);
   displaySummary(account);
 };
 // displaySummary(account1.account.movements);
-let currentAccount = account1;
-updateUI(account1);
+const resetTimer = function () {
+  clearTimeout();
+};
+const startLogoutTimer = function () {
+  let time = 120;
+  const tick = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    labelTimer.textContent = `${min}:${sec}`;
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = `Log in to get started`;
+      containerApp.style.opacity = 0;
+    }
+    --time;
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer; //has to be returned inorder to check if there is an existing timer and clear it
+};
+let currentAccount, timer;
+// updateUI(account1);
 // containerApp.style.opacity = 100;
 //?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
 btnLogin.addEventListener('click', function (e) {
@@ -225,6 +248,9 @@ btnLogin.addEventListener('click', function (e) {
     containerApp.style.opacity = '100';
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur(); //to make the cursor lose foucs after we log in
+    if (timer) clearInterval(timer);
+    timer = startLogoutTimer();
+
     updateUI(currentAccount);
   } else alert('Wrong Credentials!');
 });
@@ -243,7 +269,8 @@ btnTransfer.addEventListener('click', function (e) {
     currentAccount.movements.push(-amount);
     currentAccount.movementsDates.push(new Date().toISOString());
     reciever.movementsDates.push(new Date().toISOString());
-
+    clearInterval(timer);
+    timer = startLogoutTimer();
     updateUI(currentAccount);
   } else alert('Invalid transfer!');
   inputTransferTo.value = inputTransferAmount.value = '';
@@ -266,6 +293,8 @@ btnLoan.addEventListener('click', function (e) {
         inputLoanAmount.value = '';
         inputLoanAmount.blur();
       }, 3000);
+      clearInterval(timer);
+      timer = startLogoutTimer();
     } else
       alert('You must have one deposit which is atleast 10% if your request!');
   } else {
@@ -289,6 +318,8 @@ btnClose.addEventListener('click', function (e) {
     inputCloseUsername.value = inputClosePin.value = '';
     inputClosePin.blur();
     labelWelcome.textContent = 'Log in to get started';
+    clearInterval(timer);
+    timer = startLogoutTimer();
   } else alert('Wrong credentials! \nAccount deletion not authorized');
 });
 let sorted = false;
@@ -296,4 +327,6 @@ btnSort.addEventListener('click', function (e) {
   e.preventDefault();
   displayMovements(currentAccount, !sorted);
   sorted = !sorted; //sorted = sorted === true ? false : true;
+  clearInterval(timer);
+  timer = startLogoutTimer();
 });
