@@ -210,7 +210,7 @@ const updateUI = function (account) {
 // displaySummary(account1.account.movements);
 let currentAccount = account1;
 updateUI(account1);
-containerApp.style.opacity = 100;
+// containerApp.style.opacity = 100;
 //?the button is inside a form so its default action when clicked is to relod the page so you should prevent it
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
@@ -258,12 +258,14 @@ btnLoan.addEventListener('click', function (e) {
       currentAccount.movements.some(mov => mov >= amount * 0.1) &&
       amount > 0
     ) {
-      currentAccount.movements.push(amount);
-      currentAccount.movementsDates.push(new Date().toISOString());
-      currentAccount.loan.push(amount);
-      updateUI(currentAccount);
-      inputLoanAmount.value = '';
-      inputLoanAmount.blur();
+      setTimeout(function () {
+        currentAccount.movements.push(amount);
+        currentAccount.movementsDates.push(new Date().toISOString());
+        currentAccount.loan.push(amount);
+        updateUI(currentAccount);
+        inputLoanAmount.value = '';
+        inputLoanAmount.blur();
+      }, 3000);
     } else
       alert('You must have one deposit which is atleast 10% if your request!');
   } else {
